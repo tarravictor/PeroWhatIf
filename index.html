@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What If Generator</title>
+  <!-- Favicon: 3D heartbroken icon (SVG emoji style) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%' stop-color='%23ff5f7e'/%3E%3Cstop offset='100%' stop-color='%23b8003a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 60s-18-13.5-18-27C14 19 24 12 32 22c8-10 18-3 18 11 0 13.5-18 27-18 27z' fill='url(%23a)' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M32 22l-5 8 5 6-5 8 5 6' stroke='%23fff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cellipse cx='32' cy='32' rx='30' ry='30' fill='none' stroke='%23000' stroke-opacity='.08' stroke-width='4'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --accent: #00adb5;
+      --accent-light: #19c2cb;
+      --accent-dark: #00858c;
+      --bg-dark: #0f0f0f;
+      --bg-darker: #080808;
+      --bg-light: #1a1a1a;
+      --bg-lighter: #252525;
+      --text-primary: #e0e0e0;
+      --text-secondary: #888;
+      --error: #ff6b6b;
+      --radius: 12px;
+      --shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 25% 25%, rgba(0, 173, 181, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(0, 173, 181, 0.1) 0%, transparent 50%);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background-color: var(--bg-light);
+      background-image: linear-gradient(to bottom right, var(--bg-light), var(--bg-darker));
+      padding: 30px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      animation: fadeIn 0.5s ease-out;
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(0, 173, 181, 0.1);
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 173, 181, 0.05) 0%, transparent 70%);
+      z-index: -1;
+      animation: rotate 60s linear infinite;
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: var(--accent);
+      margin-bottom: 20px;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(0, 173, 181, 0.3);
+      position: relative;
+      display: inline-block;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.3s ease;
+    }
+
+    h1:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      font-size: 1rem;
+      background-color: var(--bg-darker);
+      color: var(--text-primary);
+      border: 2px solid #333;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 173, 181, 0.2);
+      background-color: var(--bg-dark);
+    }
+
+    input::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.7;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      font-size: 1rem;
+      background-color: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 5px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+      z-index: -1;
+    }
+
+    button:hover {
+      background-color: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 173, 181, 0.3);
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 173, 181, 0.3);
+    }
+
+    button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.7;
+      box-shadow: none;
+    }
+
+    button:disabled:hover::before {
+      left: -100%;
+    }
+
+    #output {
+      margin-top: 25px;
+      font-style: italic;
+      color: #fff;
+      white-space: pre-wrap;
+      line-height: 1.7;
+      min-height: 200px;
+      text-align: center;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius);
+      border-left: 3px solid var(--accent);
+      animation: fadeIn 0.5s ease-out;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(5px);
+      text-shadow: 0 0 10px rgba(0, 173, 181, 0.5);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    #output::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(0, 173, 181, 0.05) 0%, transparent 50%, rgba(0, 173, 181, 0.05) 100%);
+      pointer-events: none;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      opacity: 0.8;
+      text-align: center;
+    }
+
+    .credits {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+    }
+
+    .song-info {
+      font-size: 0.8rem;
+      margin-top: 15px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      margin-top: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, var(--accent-dark), var(--accent-light));
+      width: 0%;
+      transition: width 0.1s linear;
+      position: relative;
+    }
+
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: progressShine 2s infinite;
+    }
+
+    @keyframes progressShine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* 3D Music Elements */
+    .music-element {
+      position: fixed;
+      font-size: 24px;
+      opacity: 0;
+      animation: floatElement 8s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+      filter: drop-shadow(0 0 5px rgba(0, 173, 181, 0.7));
+      will-change: transform;
+      user-select: none;
+    }
+
+    @keyframes floatElement {
+      0% {
+        transform: 
+          translateY(100vh) 
+          translateX(calc(-50% + (random(200) - 100) * 1px))
+          rotate(0deg)
+          scale(0.5);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.8;
+      }
+      90% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: 
+          translateY(-100px) 
+          translateX(calc(-50% + (random(200) - 100) * 1px))
+          rotate(360deg)
+          scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    .response-text {
+      position: relative;
+      z-index: 2;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: var(--radius);
+      animation: textGlow 3s infinite alternate;
+    }
+
+    @keyframes textGlow {
+      0% { text-shadow: 0 0 5px rgba(0, 173, 181, 0.3); }
+      100% { text-shadow: 0 0 10px rgba(0, 173, 181, 0.7); }
+    }
+
+    .music-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+
+    .music-btn {
+      background: rgba(0, 173, 181, 0.1);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .music-btn:hover {
+      background: rgba(0, 173, 181, 0.3);
+      transform: scale(1.1);
+      box-shadow: 0 0 10px rgba(0, 173, 181, 0.3);
+    }
+
+    .volume-control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 10px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .volume-slider {
+      width: 100px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* Error state */
+    .error {
+      color: var(--error);
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      input, button {
+        padding: 12px;
+      }
+      
+      #output {
+        min-height: 180px;
+        padding: 15px;
+      }
+      
+      .music-element {
+        font-size: 18px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .container {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 1.3rem;
+      }
+      
+      .song-info {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>What If Generator</h1>
+    <input id="userInput" type="text" placeholder="What if hindi ako iniwan?" autocomplete="off" />
+    <button id="generateBtn">Generate Monologue</button>
+    <div class="credits">Press Enter to submit</div>
+    <div id="output">
+      <div class="response-text">
+        Enter your deepest "what if" question and I'll give you a spoken word reflection...
+        <span class="neon-overlay"></span>
+      </div>
+      <text><strong>Demo only:</strong> This is a sample "What If" monologue generator, not a real AI. For inspiration and entertainment purposes.</text>
+    </div>
+    <footer>• Made for broken hearts and dreamers • Developed by Victor Tarra</footer>
+  </div>
+
+  <!-- Multiple MP3 files for random interchange -->
+  <audio id="backgroundMusic" preload="auto" loop>
+    <source src="Calein - Umaasa (Official Lyric Video).mp3" type="audio/mpeg">
+    <source src="Kung Wala Ka.mp3" type="audio/mpeg">
+    <source src="Multo - Cup of Joe (Official Lyric Video).mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+  
+  <script>
+    // Randomly select one of the 3 MP3s each time
+    document.addEventListener('DOMContentLoaded', () => {
+      const audio = document.getElementById('backgroundMusic');
+      const sources = [
+        "Calein - Umaasa (Official Lyric Video).mp3",
+        "Kung Wala Ka.mp3",
+        "Multo - Cup of Joe (Official Lyric Video).mp3"
+      ];
+      
+      function pickRandomSong() {
+        const idx = Math.floor(Math.random() * sources.length);
+        audio.src = sources[idx];
+        audio.load();
+      }
+      
+      pickRandomSong();
+      
+      // Also pick a new song every time a monologue is generated
+      const generateBtn = document.getElementById("generateBtn");
+      generateBtn.addEventListener("click", pickRandomSong);
+      document.getElementById("userInput").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") pickRandomSong();
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const generateBtn = document.getElementById("generateBtn");
+      const userInput = document.getElementById("userInput");
+      const outputDiv = document.getElementById("output");
+      const responseText = outputDiv.querySelector('.response-text');
+      const backgroundMusic = document.getElementById("backgroundMusic");
+      let isPlaying = false;
+
+      // Handle both button click and Enter key
+      generateBtn.addEventListener("click", generateMonologue);
+      userInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") generateMonologue();
+      });
+
+      // Response templates
+      const willTalksTemplates = [
+        "What if... {input}? Ang sakit no? Parang {metaphor}. Pero alam mo, {hope}.",
+        "{input}... Minsan iniisip ko, parang {metaphor}. Pero tandaan mo, {hope}.",
+        "Naiiyak ako pag naiisip kong {input}. Para akong {metaphor}. Pero {hope}.",
+        "Ang bigat sa puso pag {input}. Parang {metaphor}. Ngunit {hope}."
+      ];
+
+      const metaphors = [
+        "isang tangang umasa sa ulan sa gitna ng tagtuyot",
+        "bituing nag-iisa sa madilim na langit",
+        "daluyong na walang pahinga",
+        "bulaklak na nalanta sa init ng araw",
+        "bangkang napadpad sa gitna ng bagyo"
+      ];
+
+      const hopefulEndings = [
+        "ang buhay ay parang dagat - may alon, may ginhawa",
+        "ang dilim ay hindi panghabangbuhay",
+        "may liwanag sa dulo ng bawat tunnel",
+        "ang puso mong nasugatan ay magiging matibay rin",
+        "ang bawat pagsubok ay magdudulot ng paglago"
+      ];
+
+      function generateMonologue() {
+        const input = userInput.value.trim();
+        
+        if (!input) {
+          showOutput("Please enter a 'What if' question first.", true);
+          responseText.classList.add('error');
+          setTimeout(() => responseText.classList.remove('error'), 500);
+          return;
+        }
+
+        generateBtn.disabled = true;
+        userInput.disabled = true;
+        generateBtn.textContent = "Generating...";
+        
+        // Simulate processing delay
+        setTimeout(() => {
+          // Generate response
+          const response = generateResponse(input);
+          showOutput(response);
+          
+          // Start music
+          playFullSong();
+          create3DMusicElements();
+          
+          generateBtn.textContent = "Generate Monologue";
+        }, 800);
+      }
+
+      function generateResponse(input) {
+        const template = willTalksTemplates[Math.floor(Math.random() * willTalksTemplates.length)];
+        const metaphor = metaphors[Math.floor(Math.random() * metaphors.length)];
+        const hope = hopefulEndings[Math.floor(Math.random() * hopefulEndings.length)];
+        
+        return template
+          .replace('{input}', input.toLowerCase())
+          .replace('{metaphor}', metaphor)
+          .replace('{hope}', hope);
+      }
+
+      function playFullSong() {
+        // Create player controls if they don't exist
+        if (!outputDiv.querySelector('.song-info')) {
+          const playerControls = document.createElement('div');
+          playerControls.className = 'song-info';
+          playerControls.innerHTML = `
+            <span id="currentTime">0:00</span>
+            <div class="progress-container">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <span id="duration">0:00</span>
+            <div class="music-controls">
+              <button class="music-btn" id="playPauseBtn">⏵</button>
+              <button class="music-btn" id="restartBtn">↻</button>
+              <button class="music-btn" id="skipBtn">⏭</button>
+            </div>
+            <div class="volume-control">
+              <span>🔈</span>
+              <input type="range" min="0" max="1" step="0.01" value="0.7" class="volume-slider" id="volumeSlider">
+            </div>
+          `;
+          outputDiv.appendChild(playerControls);
+          
+          // Add event listeners for controls
+          document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
+          document.getElementById('restartBtn').addEventListener('click', restartSong);
+          document.getElementById('skipBtn').addEventListener('click', skipSong);
+          document.getElementById('volumeSlider').addEventListener('input', (e) => {
+            backgroundMusic.volume = e.target.value;
+          });
+        }
+        
+        backgroundMusic.currentTime = 0;
+        backgroundMusic.volume = document.getElementById('volumeSlider')?.value || 0.7;
+        
+        // Update progress bar
+        backgroundMusic.addEventListener('timeupdate', updateProgress);
+        
+        // When song ends, enable controls
+        backgroundMusic.addEventListener('ended', () => {
+          generateBtn.disabled = false;
+          userInput.disabled = false;
+          document.getElementById('playPauseBtn').textContent = '⏵';
+          isPlaying = false;
+        });
+        
+        // Play the music
+        backgroundMusic.play().then(() => {
+          document.getElementById('playPauseBtn').textContent = '⏸';
+          isPlaying = true;
+        }).catch(e => {
+          console.error("Audio playback failed:", e);
+          showOutput("Click the play button to start music", false);
+          generateBtn.disabled = false;
+          userInput.disabled = false;
+        });
+        
+        // Set up duration display
+        backgroundMusic.addEventListener('loadedmetadata', () => {
+          document.getElementById('duration').textContent = formatTime(backgroundMusic.duration);
+        });
+      }
+      
+      function togglePlayPause() {
+        if (backgroundMusic.paused) {
+          backgroundMusic.play().then(() => {
+            document.getElementById('playPauseBtn').textContent = '⏸';
+            isPlaying = true;
+          });
+        } else {
+          backgroundMusic.pause();
+          document.getElementById('playPauseBtn').textContent = '⏵';
+          isPlaying = false;
+        }
+      }
+      
+      function restartSong() {
+        backgroundMusic.currentTime = 0;
+        if (!isPlaying) {
+          backgroundMusic.play().then(() => {
+            document.getElementById('playPauseBtn').textContent = '⏸';
+            isPlaying = true;
+          });
+        }
+      }
+      
+      function skipSong() {
+        const audio = document.getElementById('backgroundMusic');
+        const sources = [
+          "Calein - Umaasa (Official Lyric Video).mp3",
+          "Kung Wala Ka.mp3",
+          "Multo - Cup of Joe (Official Lyric Video).mp3"
+        ];
+        const currentSrc = audio.src.split('/').pop();
+        let nextIdx = sources.findIndex(src => src === currentSrc) + 1;
+        if (nextIdx >= sources.length) nextIdx = 0;
+        
+        audio.src = sources[nextIdx];
+        audio.load();
+        audio.play().then(() => {
+          document.getElementById('playPauseBtn').textContent = '⏸';
+          isPlaying = true;
+        });
+      }
+      
+      function updateProgress() {
+        const progressBar = document.getElementById('progressBar');
+        const currentTime = document.getElementById('currentTime');
+        
+        if (backgroundMusic.duration) {
+          const progressPercent = (backgroundMusic.currentTime / backgroundMusic.duration) * 100;
+          progressBar.style.width = `${progressPercent}%`;
+          currentTime.textContent = formatTime(backgroundMusic.currentTime);
+        }
+      }
+      
+      function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      }
+      
+      function create3DMusicElements() {
+        const elements = ['♪', '♫', '♩', '♬', '🎵', '🎶', '💔', '✨', '🌊', '🔥'];
+        const colors = ['#00adb5', '#ff2e63', '#08d9d6', '#e84545', '#ff9a00'];
+        
+        // Clear existing elements
+        document.querySelectorAll('.music-element').forEach(el => el.remove());
+        
+        // Create floating elements
+        for (let i = 0; i < 30; i++) {
+          setTimeout(() => {
+            const element = document.createElement('div');
+            element.className = 'music-element';
+            element.textContent = elements[Math.floor(Math.random() * elements.length)];
+            element.style.left = `${Math.random() * 100}%`;
+            element.style.animationDuration = `${6 + Math.random() * 6}s`;
+            element.style.animationDelay = `${Math.random() * 3}s`;
+            element.style.color = colors[Math.floor(Math.random() * colors.length)];
+            element.style.fontSize = `${20 + Math.random() * 30}px`;
+            document.body.appendChild(element);
+          }, i * 200);
+        }
+      }
+
+      function showOutput(text, isError = false) {
+        responseText.style.color = isError ? "var(--error)" : "var(--text-primary)";
+        responseText.textContent = text;
+        
+        if (isError) {
+          responseText.classList.add('error');
+          setTimeout(() => responseText.classList.remove('error'), 500);
+        }
+      }
+    });
+  </script>
+
+<!-- Softer overlay centered modal, less neon, no full-screen flashbang -->
+<style>
+  .neon-overlay {
+    position: fixed;
+    z-index: 99999;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(15, 20, 30, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    transition: opacity 0.3s;
+    animation: neonFadeIn 0.3s cubic-bezier(.4,2,.6,1) 1;
+  }
+  @keyframes neonFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .neon-overlay-content {
+    background: #18232f;
+    border-radius: 16px;
+    padding: 36px 28px 28px 28px;
+    box-shadow: 0 4px 32px #00eaff33, 0 1px 8px #0008;
+    min-width: 280px;
+    max-width: 90vw;
+    text-align: center;
+    border: 1.5px solid #00adb555;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .neon-overlay-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #fff;
+    text-shadow: 0 0 8px #00adb555;
+  }
+  .neon-overlay-desc {
+    font-size: 1rem;
+    color: #b2ebf2;
+    margin-bottom: 4px;
+    text-shadow: 0 0 4px #00adb533;
+  }
+  .neon-overlay-x {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 1.3rem;
+    color: #fff;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    box-shadow: none;
+    z-index: 2;
+  }
+  .neon-overlay-x:hover {
+    background: #00adb5;
+    color: #0f0f0f;
+  }
+  @media (max-width: 500px) {
+    .neon-overlay-content {
+      padding: 20px 6px 16px 6px;
+      min-width: 0;
+      font-size: 0.95rem;
+    }
+    .neon-overlay-title {
+      font-size: 1.05rem;
+    }
+  }
+</style>
+<script>
+  // Show overlay modal in center, not full neon flashbang
+  function showNeonOverlay() {
+    if (document.querySelector('.neon-overlay')) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'neon-overlay';
+    overlay.innerHTML = `
+      <div class="neon-overlay-content" style="position:relative;">
+        <button class="neon-overlay-x" aria-label="Close overlay" title="Close">&times;</button>
+        <div class="neon-overlay-title">Protected Content</div>
+        <div class="neon-overlay-desc">
+          This action is not allowed.<br>
+          Copying, right-click, and developer tools are disabled for this page.
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Close overlay on X button click
+    overlay.querySelector('.neon-overlay-x').onclick = () => {
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 200);
+    };
+
+    // Also close on Escape key
+    overlay.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        overlay.querySelector('.neon-overlay-x').click();
+      }
+    });
+    overlay.tabIndex = -1;
+    overlay.focus();
+  }
+
+  // Prevent right-click context menu
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    showNeonOverlay();
+  });
+
+  // Prevent F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, Ctrl+Shift+C, Ctrl+Shift+J, Ctrl+P, Ctrl+C, etc.
+  document.addEventListener('keydown', function(e) {
+    // F12
+    if (e.key === 'F12') {
+      showNeonOverlay();
+      e.preventDefault();
+      return false;
+    }
+    // Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J, Ctrl+Shift+K
+    if (e.ctrlKey && e.shiftKey && ['I', 'C', 'J', 'K'].includes(e.key.toUpperCase())) {
+      showNeonOverlay();
+      e.preventDefault();
+      return false;
+    }
+    // Ctrl+U, Ctrl+S, Ctrl+P, Ctrl+C
+    if (e.ctrlKey && ['U', 'S', 'P', 'C'].includes(e.key.toUpperCase())) {
+      showNeonOverlay();
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // Prevent drag and drop
+  document.addEventListener('dragstart', function(e) {
+    e.preventDefault();
+    showNeonOverlay();
+  });
+
+  // Prevent selection
+  document.addEventListener('selectstart', function(e) {
+    e.preventDefault();
+    showNeonOverlay();
+  });
+
+  // Prevent PrintScreen (not reliable, but can try to clear clipboard)
+  document.addEventListener('keyup', function(e) {
+    if (e.key === 'PrintScreen') {
+      if (navigator.clipboard) navigator.clipboard.writeText('');
+      showNeonOverlay();
+    }
+  });
+</script>
+</body>
+</html>
